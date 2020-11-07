@@ -50,47 +50,46 @@ class CatholicAndEthnicNewspaperSpider(scrapy.Spider):
             yield Request(next_url)
 
     def parse_post(self, response):
-        # author = response.xpath('//div[@class="author"]').css('::text').extract()[1] if \
-        #     response.xpath('//div[@class="author"]').css('::text').extract()[1] else ''
+        author = self.parse_author(response)
+        time_format, short_date = self.parse_date(response)
         item = NewsItem(
             # title=response.xpath('//h1/text()').get(),
-            # timestamp=self.parse_timestamp(response),
+            # timestamp=time_format,
             # content_html=response.xpath('//div[@class="news_content entry-content"]').get(),
             # body=html2text.html2text(response.xpath('//div[@class="news_content entry-content"]').get()),
             # link=response.url,
             # subhead='',
-            # pic=self.parse_pictures(response),
-            date=self.parse_date(response),
-            author=''
+            pic=self.parse_pictures(response),
+            # date=short_date,
+            # author=author
         )
         yield item
 
-    @staticmethod
-    def parse_timestamp(response):
-        # 07/10/2020 05:28 GMT+7
-        created_raw = response.xpath('//body//div[@class="date-time"]/text()').get()
-        created_raw = created_raw.replace("GMT+7", "GMT+0700")
-        created_at = datetime.strptime(created_raw.strip(), '%d/%m/%Y %H:%M %Z%z')
-        return created_at
-
     def parse_date(self, response):
         # 07/10/2020
-        created_raw = response.xpath('//p[@class="date published"]').get()
-        print(created_raw)
+        created_raw = response.xpath('//p[@class="date published"]/text()').get()
         date_split = created_raw.split(',')
         day_month = date_split[1].strip().split(' ', 1)
-        print(day_month)
         month = self.convert_month(day_month[1])
-        print(month)
-        # created_raw = created_raw.replace("GMT+7", "GMT+0700")
-        # created_at = datetime.strptime(created_raw.strip(), '%d/%m/%Y %H:%M %Z%z')
-        # return created_at.strftime('%m/%d/%Y')
-        return 12
+        day = day_month[0]
+
+        yhm = date_split[2].strip()
+        yyyy = yhm[:4]
+        hh = yhm.split(' ')[1].split(':')[0]
+        mm = yhm.split(' ')[1].split(':')[1]
+
+        dt = datetime(year=int(yyyy), month=int(month), day=int(day), hour=int(hh), minute=int(mm))
+        short_date = '{}/{}/{}'.format(dt.month, dt.day, dt.year)
+        time_format = dt.isoformat()
+        return time_format, short_date
 
     @staticmethod
     def parse_pictures(response):
-        urls = response.xpath('//div[@id="main-detail-body"]//div[@type="Photo"]//img/@src').extract()
-        captions = response.xpath('//div[@id="main-detail-body"]//div[@type="Photo"]//img/@title').extract()
+        urls = response.xpath('//table[@class="image"]/tbody/tr[1]/td/img/@src').extract()
+        captions = response.xpath('//table[@class="image"]/tbody/tr[2]/td').extract()
+        print('@@@@@@@')
+        print(urls)
+        print(captions)
         res = [i + '|' + j for i, j in zip(urls, captions)]
         if urls:
             result = '&&'.join(res)
@@ -101,14 +100,37 @@ class CatholicAndEthnicNewspaperSpider(scrapy.Spider):
     @staticmethod
     def convert_month(month):
         month = month.strip()
-        # print(month)
-        # print('Tháng Tư')
-        # print(month == 'Tháng Tư')
-        if month == 'Thang Tám':
+        if month == 'Tháng Tám':
             return 8
-        elif month == 'Tháng Tư':
+        elif month == 'Tháng Tư':
             return 4
-        elif month == 'Tháng Chín':
+        elif month == 'Tháng Chín':
             return 9
-        elif month == 'Tháng Mười':
+        elif month == 'Tháng Mười':
             return 10
+        elif month == 'Tháng Bảy':
+            return 7
+        elif month == 'Tháng Mười Hai':
+            return 12
+        elif month == 'Tháng Giêng':
+            return 1
+        elif month == 'Tháng Ba':
+            return 3
+        elif month == 'Tháng Hai':
+            return 2
+        elif month == 'Tháng Năm':
+            return 5
+        elif month == 'Tháng Sáu':
+            return 6
+        elif month == 'Tháng Mười Một':
+            return 11
+
+    def parse_author(self, response):
+        if response.xpath('//p[@style="text-align: right;"]/strong/text()').extract():
+            author = response.xpath('//p[@style="text-align: right;"]/strong/text()')[-1].extract()
+        elif response.xpath('//p[@style="text-align: right;"]/span/text()'):
+            author = response.xpath('//p[@style="text-align: right;"]/span/text()')[-1].extract()
+        else:
+            author = ''
+        return author
+
