@@ -7,7 +7,7 @@ from demo.items import NewsItem
 
 
 class HeritageSpider(scrapy.Spider):
-    name = 'VietnamHeritageMagazine'
+    name = 'Heritage'
     site_name = 'heritagevietnamairlines.com'
     allowed_domains = ['heritagevietnamairlines.com']
     start_urls = ['http://heritagevietnamairlines.com/category/tin-tuc/',

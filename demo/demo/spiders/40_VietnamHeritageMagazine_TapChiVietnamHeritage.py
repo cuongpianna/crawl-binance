@@ -1,4 +1,3 @@
-# 1h
 import scrapy
 from scrapy import Request
 import html2text

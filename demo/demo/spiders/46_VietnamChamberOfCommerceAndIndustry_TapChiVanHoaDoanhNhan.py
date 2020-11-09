@@ -1,8 +1,6 @@
 import scrapy
-import urllib.parse
-import re
 from datetime import datetime
-from scrapy import Spider, Request
+from scrapy import Request
 import html2text
 
 from demo.items import NewsItem
@@ -12,8 +10,6 @@ class VietnamChamberOfCommerceAndIndustry(scrapy.Spider):
     name = 'VietnamChamberOfCommerceAndIndustry'
     site_name = 'vhdn.vn'
     allowed_domains = ['vhdn.vn']
-
-    base_url = 'https://nguoixaydung.com.vn'
     start_urls = ['https://vhdn.vn/tin-tuc-vcci/', 'https://vhdn.vn/van-hoa-doanh-nhan/',
                   'https://vhdn.vn/van-hoa-doanh-nhan/', 'https://vhdn.vn/phap-luat/',
                   'https://vhdn.vn/ket-noi-doanh-nghiep/', 'https://vhdn.vn/clb-van-hoa-doanh-nhan/',

@@ -89,3 +89,10 @@ ROBOTSTXT_OBEY = False
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
 FEED_EXPORT_FIELDS = ['date', 'timestamp', 'title', 'subhead', 'author', 'link', 'pic', 'body', 'content_html']
+# FEED_EXPORT_FIELDS = ['link', 'body']
+
+DOWNLOADER_MIDDLEWARES = {
+    # 'page.middlewares.PageDownloaderMiddleware': 543,
+    'scrapy_selenium.SeleniumMiddleware': 800,
+}
+SELENIUM_DRIVER_ARGUMENTS=['headless']
