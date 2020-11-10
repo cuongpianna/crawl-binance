@@ -1,6 +1,4 @@
 import scrapy
-import urllib.parse
-import re
 from datetime import datetime
 from scrapy import Spider, Request
 import html2text
