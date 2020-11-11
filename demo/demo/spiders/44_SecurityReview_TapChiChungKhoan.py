@@ -1,3 +1,4 @@
+import os
 import scrapy
 from datetime import datetime
 from scrapy import Request
@@ -20,7 +21,7 @@ class SecurityReviewSpider(scrapy.Spider):
     custom_settings = {
         'DUPEFILTER_CLASS': 'scrapy.dupefilters.BaseDupeFilter',
         'SELENIUM_DRIVER_NAME': 'chrome',
-        'SELENIUM_DRIVER_EXECUTABLE_PATH': 'D:\WORKING\DEMO\demo\chromedriver.exe',
+        'SELENIUM_DRIVER_EXECUTABLE_PATH': os.path.join(os.path.abspath(os.curdir), 'chromedriver.exe'),
     }
 
     def __init__(self, *args, **kwargs):
@@ -31,52 +32,72 @@ class SecurityReviewSpider(scrapy.Spider):
         yield SeleniumRequest(url=self.url, callback=self.parse)
 
     def parse(self, response):
+        print('ssssssss')
+        urls = []
         self.driver = response.meta['driver']
-        print('@@@@@@@@')
-        print(response.xpath('//*[@id="pt1:soc1::content"]/option/@value').extract())
-        self.driver.find_element_by_xpath('//*[@id="pt1:soc1::content"]/option[2]').click()
+        news_type = response.xpath('//*[@id="pt1:soc1::content"]/option/text()').extract()
+        news_type = news_type[::-1]
+        for t in news_type:
+
+            self.driver.find_element_by_xpath(
+                    '//*[@id="pt1:soc1::content"]/option[text()="{}"]'.format(t)).click()
+            time.sleep(1)
+
+            years = self.driver.find_elements_by_xpath('//*[@id="pt1:soc2::content"]/option')
+            years = years[::-1]
+            count = 0
+
+            for year in years:
+                yearss = self.driver.find_elements_by_xpath('//*[@id="pt1:soc2::content"]/option')
+                yearss = yearss[::-1]
+
+                yearss[count].click()
+
+                time.sleep(1)
+                magazines = self.driver.find_elements_by_xpath('//*[@id="pt1:soc3::content"]/option')
+                magazines = magazines[::-1]
+
+                for index, magazine in enumerate(magazines):
+                    magazines_flag = self.driver.find_elements_by_xpath('//*[@id="pt1:soc2::content"]/option')
+                    magazines_flag = magazines_flag[::-1]
+
+                    magazines_flag[index].click()
+
+
+                    button = self.driver.find_element_by_xpath('//*[@id="pt1:ctb1"]/a')
+                    time.sleep(1)
+                    self.driver.execute_script("arguments[0].click();", button)
+                    time.sleep(1)
+
+                    posts = self.driver.find_elements_by_xpath('//*[@id="pt1:pbl24"]//a')
+                    for p in posts:
+                        href = p.get_attribute('href')
+                        urls.append(href)
+                        yield Request(href, callback=self.parse_post)
+
+                count += 1
+        print('@@@@@@@@@@@')
+        print(urls)
         time.sleep(5)
 
-    # def parse(self, response):
-    #
-    #     top_item = response.xpath('//div[@class="top-item"]//h2/a').css('::attr(href)').get()
-    #     if top_item:
-    #         yield SeleniumRequest(url=top_item, callback=self.parse_post)
-    #
-    #     scroll_news = response.xpath('//div[@id="top-news-scroll"]/ul/li//a[@class="font-16"]').css('::attr(href)')
-    #     if scroll_news:
-    #         for new in scroll_news:
-    #             time.sleep(1)
-    #             yield SeleniumRequest(url=new.extract(), callback=self.parse_post)
-    #
-    #     posts = response.xpath('//ul[@class="feed"]/li/h2/a').css('::attr(href)')
-    #
-    #     for post in posts:
-    #         url_extract = post.extract()
-    #         yield SeleniumRequest(url=url_extract, callback=self.parse_post)
-    #
-    #     next_page = response.xpath('//a[@class="btn btn-xs font-14 btn-primary"]')
-    #
-    #     if next_page:
-    #         next_url = response.xpath('//a[@class="btn btn-xs font-14 btn-primary"]').css('::attr(href)').get()
-    #         yield SeleniumRequest(url=next_url)
-    #
-    # def parse_post(self, response):
-    #     time_format, short_date = self.parse_date(response)
-    #     content, html = self.parse_content(response)
-    #     if response.xpath('//h1[@class="post-title main-title"]/text()').get():
-    #         item = NewsItem(
-    #             title=response.xpath('//h1[@class="post-title main-title"]/text()').get(),
-    #             timestamp=time_format,
-    #             content_html=content,
-    #             body=html,
-    #             link=response.url,
-    #             subhead=response.xpath('//h2[@class="post-sapo"]/strong/text()').get(),
-    #             pic=self.parse_pictures(response),
-    #             date=short_date,
-    #             author=''
-    #         )
-    #         yield item
+    def parse_post(self, response):
+        print('!!!!!!!!')
+        print(response)
+        # time_format, short_date = self.parse_date(response)
+        # content, html = self.parse_content(response)
+        # if response.xpath('//h1[@class="post-title main-title"]/text()').get():
+        #     item = NewsItem(
+        #         title=response.xpath('//h1[@class="post-title main-title"]/text()').get(),
+        #         timestamp=time_format,
+        #         content_html=content,
+        #         body=html,
+        #         link=response.url,
+        #         subhead=response.xpath('//h2[@class="post-sapo"]/strong/text()').get(),
+        #         pic=self.parse_pictures(response),
+        #         date=short_date,
+        #         author=''
+        #     )
+        #     yield item
     #
     # def parse_date(self, response):
     #     print(response.xpath('//script[@type="application/ld+json"][3]'))
