@@ -1,15 +1,24 @@
 
 ### Install requirements (windows)
-  Open command line and go inside the project. Ex: cd: D:\news_spider
+  Open command line and go inside the project. 
+  
+  Example: cd: D:\news_spider
+  
   Create virtualenv for project:
+  
       virtualenv venv
+      
   Active venv:
+  
     venv\Script\active
+    
   Install dependencies:
+  
     pip install -r requirements.txt
 
 ### Run the project
   Go to scrapy project. Enter command:
+  
     cd demo
 
   Run project:
@@ -20,5 +29,7 @@
 
 ### Note:
   You can see the spider names in: demo/demo/spiders/filename.py
-  example: 
+  
+  example:
+   
     scrapy crawl CatholicAndEthnicNewspaper -o CatholicAndEthnicNewspaper.csv -t csv
