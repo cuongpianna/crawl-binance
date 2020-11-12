@@ -1,4 +1,3 @@
-# start 2h
 import scrapy
 from datetime import datetime
 import json

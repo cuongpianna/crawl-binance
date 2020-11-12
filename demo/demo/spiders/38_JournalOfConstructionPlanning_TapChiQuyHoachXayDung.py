@@ -1,4 +1,3 @@
-# 1 hour
 import scrapy
 from datetime import datetime
 from dateutil import parser

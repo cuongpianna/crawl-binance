@@ -56,3 +56,6 @@ FEED_EXPORT_FIELDS = ['date', 'timestamp', 'title', 'subhead', 'author', 'link',
 #     'scrapy_selenium.SeleniumMiddleware': 800,
 # }
 
+# SELENIUM_DRIVER_ARGUMENTS=['headless']
+#SELENIUM_DRIVER_ARGUMENTS=['non headless', '--start-maximized']
+USER_AGENT = "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.93 Safari/537.36"
