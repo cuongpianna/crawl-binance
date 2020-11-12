@@ -76,7 +76,11 @@ class HeritageSpider(scrapy.Spider):
         yield item
 
     def parse_date(self, response):
-        # 2019-11-20T16:23:59+00:00
+        """
+        Convert datetime string to timestamp, date
+        :param response: 2019-11-20T16:23:59+00:00
+        :return:
+        """
         created_raw = response.xpath('//meta[@property="article:published_time"]/@content').get()
         converted_time = dateutil.parser.isoparse(created_raw)
 
