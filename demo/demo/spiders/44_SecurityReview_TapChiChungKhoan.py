@@ -3,7 +3,6 @@ import scrapy
 from datetime import datetime
 from scrapy import Request
 import html2text
-from urllib.parse import urljoin
 from scrapy_selenium import SeleniumRequest
 from dateutil import parser
 import time
@@ -29,12 +28,6 @@ class SecurityReviewSpider(scrapy.Spider):
     def __init__(self, *args, **kwargs):
         self.driver = None
         super().__init__(*args, **kwargs)
-
-    # def start_requests(self):
-    #     print('sssssssssss')
-    #     yield Request(
-    #         'https://www.ssc.gov.vn/ubck/faces/oracle/webcenter/portalapp/pages/vi/aptcnoidungchitiet.jspx?id=1450&_afrLoop=52690246195000&_afrWindowMode=0#%40%3F_afrLoop%3D52690246195000%26id%3D1450%26_afrWindowMode%3D0%26_adf.ctrl-state%3Dghxszp93t_23',
-    #         callback=self.parse_post)
 
     def start_requests(self):
         yield SeleniumRequest(url=self.url, callback=self.parse)

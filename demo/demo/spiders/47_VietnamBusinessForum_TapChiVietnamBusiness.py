@@ -18,6 +18,7 @@ categories = {
     'van-hoa-du-lich': '/cate/751/van-hoa-du-lich.html',
 }
 
+
 class VietnamBusinessForumSpider(Spider):
     name = 'VietnamBusinessForum'
     site_name = 'vccinews.vn'
@@ -105,8 +106,9 @@ class VietnamBusinessForumSpider(Spider):
                       response.xpath('//div[@class="desc-ctn"]/div/p[last()]/b/span/text()').get() or \
                       response.xpath('//div[@class="desc-ctn"]/span/text()').get() or \
                       response.xpath('//span/span/span/em/span/strong/text()').get() or \
-                        response.xpath('//*[@class="desc-ctn"]/p/i/span/text()').get() or \
-                        response.xpath('(//*[@class="desc-ctn"]/div)[last()]//span[@style="font-weight: bold;"][last()]/text()').get()
+                      response.xpath('//*[@class="desc-ctn"]/p/i/span/text()').get() or \
+                      response.xpath(
+                          '(//*[@class="desc-ctn"]/div)[last()]//span[@style="font-weight: bold;"][last()]/text()').get()
         }
 
     @staticmethod
