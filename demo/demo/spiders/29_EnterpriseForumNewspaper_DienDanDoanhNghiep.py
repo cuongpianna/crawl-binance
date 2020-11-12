@@ -1,7 +1,5 @@
 import scrapy
 from datetime import datetime
-from scrapy import Request
-import html2text
 from urllib.parse import urljoin
 from scrapy_selenium import SeleniumRequest
 from dateutil import parser
@@ -36,13 +34,6 @@ class EnterpriseForumNewspaper(scrapy.Spider):
                   'https://enternews.vn/nguoi-viet-tu-te-c299',
                   ]
     base_url = 'https://enternews.vn/'
-
-    # custom_settings = {
-    #     'DUPEFILTER_CLASS': 'scrapy.dupefilters.BaseDupeFilter',
-    #     'SELENIUM_DRIVER_NAME': 'chrome',
-    #     'SELENIUM_DRIVER_EXECUTABLE_PATH': 'D:\WORKING\DEMO\demo\chromedriver.exe',
-    #
-    # }
 
     def parse(self, response):
 
@@ -86,7 +77,6 @@ class EnterpriseForumNewspaper(scrapy.Spider):
             yield item
 
     def parse_date(self, response):
-        print(response.xpath('//script[@type="application/ld+json"][3]'))
         if response.xpath('//div[@class="post-author cl"]/span/text()').get():
             raw_time = response.xpath('//div[@class="post-author cl"]/span/text()').get().replace('| ', '').strip()
             true_time = parser.parse(raw_time)
@@ -95,7 +85,6 @@ class EnterpriseForumNewspaper(scrapy.Spider):
                                     month=true_time.month)
             return publish_date.isoformat(), '{}/{}/{}'.format(true_time.month, true_time.day, true_time.year)
         else:
-            print(response.xpath('//body'))
             return '', ''
 
     def parse_pictures(self, response):

@@ -33,8 +33,6 @@ class ConstructorMagazineSpider(scrapy.Spider):
 
         posts = response.xpath('//div[@id="blockthree"]//h3/a').css('::attr(href)')
 
-        print(response.url)
-
         if posts:
             for post in posts:
                 url_extract = urllib.parse.urljoin(self.base_url, post.extract())
