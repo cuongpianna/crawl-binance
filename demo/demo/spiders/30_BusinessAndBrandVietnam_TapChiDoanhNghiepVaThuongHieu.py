@@ -170,5 +170,7 @@ class BusinessAndBrandVietnamSpider(scrapy.Spider):
                 response.xpath('//div[@class="content content-mb mb-20 overflow-hidden t-16-mb"]/p[last()]').get())
         elif response.xpath('//div[@class="content content-mb mb-20 overflow-hidden t-16-mb"]//*[@class="article-bottom"]').get():
             return html2text.html2text(response.xpath('//div[@class="content content-mb mb-20 overflow-hidden t-16-mb"]//*[@class="article-bottom"]')).get()
+        if response.xpath('//*[@id="FooterNewsAuthorAndSource"]'):
+            return html2text.html2text(response.xpath('//*[@id="FooterNewsAuthorAndSource"]').get())
         return ''
 

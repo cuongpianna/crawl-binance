@@ -13,20 +13,28 @@ from demo.items import NewsItem
 
 class SecurityReviewSpider(scrapy.Spider):
     name = 'SecurityReview'
-    # site_name = 'enternews.vn'
-    # allowed_domains = ['enternews.vn']
-    # base_url = 'https://enternews.vn/'
     url = 'https://www.ssc.gov.vn/ubck/faces/vi/vilinks/vipageslink/vilinksquery_aptc/tapchichungkhoan?_adf.ctrl-state=15rte8ayhf_18&_afrLoop=11809071372000'
 
     custom_settings = {
         'DUPEFILTER_CLASS': 'scrapy.dupefilters.BaseDupeFilter',
         'SELENIUM_DRIVER_NAME': 'chrome',
         'SELENIUM_DRIVER_EXECUTABLE_PATH': os.path.join(os.path.abspath(os.curdir), 'chromedriver.exe'),
+        'SELENIUM_DRIVER_ARGUMENTS': ['headless']
+
     }
+
+    # SELENIUM_DRIVER_ARGUMENTS=['headless']
+    # SELENIUM_DRIVER_ARGUMENTS = ['non headless', '--start-maximized']
 
     def __init__(self, *args, **kwargs):
         self.driver = None
         super().__init__(*args, **kwargs)
+
+    # def start_requests(self):
+    #     print('sssssssssss')
+    #     yield Request(
+    #         'https://www.ssc.gov.vn/ubck/faces/oracle/webcenter/portalapp/pages/vi/aptcnoidungchitiet.jspx?id=1450&_afrLoop=52690246195000&_afrWindowMode=0#%40%3F_afrLoop%3D52690246195000%26id%3D1450%26_afrWindowMode%3D0%26_adf.ctrl-state%3Dghxszp93t_23',
+    #         callback=self.parse_post)
 
     def start_requests(self):
         yield SeleniumRequest(url=self.url, callback=self.parse)
@@ -53,7 +61,7 @@ class SecurityReviewSpider(scrapy.Spider):
 
                 yearss[count].click()
 
-                time.sleep(1)
+                time.sleep(.8)
                 magazines = self.driver.find_elements_by_xpath('//*[@id="pt1:soc3::content"]/option')
                 magazines = magazines[::-1]
 
@@ -65,9 +73,9 @@ class SecurityReviewSpider(scrapy.Spider):
 
 
                     button = self.driver.find_element_by_xpath('//*[@id="pt1:ctb1"]/a')
-                    time.sleep(1)
+                    time.sleep(.8)
                     self.driver.execute_script("arguments[0].click();", button)
-                    time.sleep(1)
+                    time.sleep(.8)
 
                     posts = self.driver.find_elements_by_xpath('//*[@id="pt1:pbl24"]//a')
                     for p in posts:
@@ -76,54 +84,37 @@ class SecurityReviewSpider(scrapy.Spider):
                         yield Request(href, callback=self.parse_post)
 
                 count += 1
-        print('@@@@@@@@@@@')
-        print(urls)
-        time.sleep(5)
 
     def parse_post(self, response):
-        print('!!!!!!!!')
-        print(response)
-        # time_format, short_date = self.parse_date(response)
-        # content, html = self.parse_content(response)
-        # if response.xpath('//h1[@class="post-title main-title"]/text()').get():
-        #     item = NewsItem(
-        #         title=response.xpath('//h1[@class="post-title main-title"]/text()').get(),
-        #         timestamp=time_format,
-        #         content_html=content,
-        #         body=html,
-        #         link=response.url,
-        #         subhead=response.xpath('//h2[@class="post-sapo"]/strong/text()').get(),
-        #         pic=self.parse_pictures(response),
-        #         date=short_date,
-        #         author=''
-        #     )
-        #     yield item
-    #
-    # def parse_date(self, response):
-    #     print(response.xpath('//script[@type="application/ld+json"][3]'))
-    #     if response.xpath('//div[@class="post-author cl"]/span/text()').get():
-    #         raw_time = response.xpath('//div[@class="post-author cl"]/span/text()').get().replace('| ', '').strip()
-    #         true_time = parser.parse(raw_time)
-    #         publish_date = datetime(year=true_time.year, minute=true_time.minute, hour=true_time.hour,
-    #                                 day=true_time.day,
-    #                                 month=true_time.month)
-    #         return publish_date.isoformat(), '{}/{}/{}'.format(true_time.month, true_time.day, true_time.year)
-    #     else:
-    #         print(response.xpath('//body'))
-    #         return '', ''
-    #
-    # def parse_pictures(self, response):
-    #     urls = response.xpath('//img[@class="image_center"]/@src').extract()
-    #     urls = [urljoin(self.base_url, item) for item in urls]
-    #     captions = response.xpath('//img[@class="image_center"]/@alt').extract()
-    #     res = [i + '|' + j for i, j in zip(urls, captions)]
-    #     if urls:
-    #         result = '&&'.join(res)
-    #         return result
-    #     else:
-    #         return ''
-    #
-    # def parse_content(self, response):
-    #     raw_text = response.xpath('//div[@class="post-content "]/p/text()').extract()
-    #     raw_html = response.xpath('//div[@class="post-content "]/p').extract()
-    #     return ' '.join(raw_text), ' '.join(raw_html)
+        time_format, short_date = self.parse_date(response)
+        content, html = self.parse_content(response)
+        item = NewsItem(
+            title=html2text.html2text(response.xpath('//*[@id="pt1:pbl16"]').get()),
+            timestamp=time_format,
+            content_html=html,
+            body=content,
+            link=response.url,
+            subhead=html2text.html2text(response.xpath('//*[@id="pt1:pbl18"]').get()),
+            pic='',
+            date=short_date,
+            author=''
+        )
+        yield item
+
+    def parse_date(self, response):
+        """
+
+        :param response: Time format: 15/12/2018
+        :return:
+        """
+        raw_time = response.xpath('//*[@id="pt1:pbl20"]//tbody//td[2]/text()').get().strip()
+        true_time = parser.parse(raw_time)
+        publish_date = datetime(year=true_time.year, minute=true_time.minute, hour=true_time.hour,
+                                day=true_time.day,
+                                month=true_time.month)
+        return publish_date.isoformat(), '{}/{}/{}'.format(true_time.month, true_time.day, true_time.year)
+
+    def parse_content(self, response):
+        raw_text = html2text.html2text(response.xpath('//*[@id="pt1:pbl13"]').get())
+        raw_html = response.xpath('//*[@id="pt1:pbl18"]').get()
+        return raw_text, raw_html

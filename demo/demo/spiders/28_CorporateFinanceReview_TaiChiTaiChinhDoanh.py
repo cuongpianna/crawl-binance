@@ -15,6 +15,11 @@ class CorporateFinanceReviewSpider(scrapy.Spider):
     start_urls = ['https://taichinhdoanhnghiep.net.vn/tin-tuc/']
     base_url = 'https://taichinhdoanhnghiep.net.vn/'
 
+    custom_settings = {
+        'USER_AGENT': 'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.93 Safari/537.36',
+
+    }
+
     def parse(self, response):
         posts = response.xpath('//div[@class="web-cat-left lt"]//article/h3/a/@href')
         if posts:
