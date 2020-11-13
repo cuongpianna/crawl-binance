@@ -16,7 +16,7 @@ class VietnamJournalOfConstructionSpider(scrapy.Spider):
     base_url = 'http://tapchixaydungbxd.vn/'
     base_api = 'http://tapchixaydungbxd.vn/?module=Content.Listing&moduleId=23&cmd=redraw&site=13255&url_mode=rewrite&submitFormId=23&moduleId=23&page=customPage&site=13255'
 
-    def __init__(self, page=100, *args, **kwargs):
+    def __init__(self, page=10, *args, **kwargs):
         super(VietnamJournalOfConstructionSpider, self).__init__(*args, **kwargs)
         self.page = int(page)
 
