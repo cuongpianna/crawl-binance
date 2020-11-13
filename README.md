@@ -47,7 +47,9 @@
   + CorporateFinanceReview
   + EnterpriseForumNewspaper
   + BusinessAndBrandVietnam
-  + CivilEngineeringNewspaper             (argument)
+  + BridgeRoadTopicsNews
+  + CivilEngineeringNewspaper             (Argument)
+  + VietnamJournalOfConstruction  (Argument)
   + ConstructorMagazine
   + BuildingMaterialsMagazine
   + JournalOfConstructionPlanning
@@ -60,7 +62,7 @@
   + VietnamBanksAssociationSpider
   + VietnamChamberOfCommerceAndIndustry
   + VietnamBusinessForum
-  + MekongASEANReview              (argument)
+  + MekongASEANReview              (Argument)
   + BiddingReview
   + EconomyAndForecastReview
   + VietnamIndustrialZoneReview
