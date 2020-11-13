@@ -45,6 +45,30 @@ class BridgeRoadTopicsNewsSpider(scrapy.Spider):
                 yield response.follow(next_page)
 
     def parse_post(self, response):
+        """ This function returns newspaper articles on a given date in a given structure.
+
+            Return data structure:
+            [
+                {
+                            'title': string,                        # The title of a article
+                            'author'                                # The author of a article, of '' if none
+                            'subhead': string,                      # The subtitle of a article, or '' if there is no subtitle
+                            'print': string,                        # The page number of a article
+                            'date': string in '%Y-%m-%d' format,    # The publish date of a article
+                            'timestamp': datetime                   # The ISO publish date of a article
+                            'body': string                          # The body of a article
+                            'pic': string in                        # The link of pictures of a article, or '' if there are no pictures
+                                                                            f"{link1}|{text2}&&..." format
+                            'link': string                          # The url of a article
+                        },
+                                ...
+                    ]
+                    or
+                    None
+
+                :param response: The scrapy response
+                :return:
+                """
         time_format, short_date, author = self.parse_date_author(response)
         item = NewsItem(
             title=response.xpath('//h1/text()').get(),

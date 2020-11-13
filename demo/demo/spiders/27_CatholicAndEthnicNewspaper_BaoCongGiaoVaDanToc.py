@@ -52,9 +52,28 @@ class CatholicAndEthnicNewspaperSpider(scrapy.Spider):
             yield Request(next_url)
 
     def parse_post(self, response):
-        """
-        Extract post and yield it to pipeline
-        :param response:
+        """ This function returns newspaper articles on a given date in a given structure.
+
+            Return data structure:
+            [
+                {
+                    'title': string,                        # The title of a article
+                    'author'                                # The author of a article, of '' if none
+                    'subhead': string,                      # The subtitle of a article, or '' if there is no subtitle
+                    'print': string,                        # The page number of a article
+                    'date': string in '%Y-%m-%d' format,    # The publish date of a article
+                    'timestamp': datetime                   # The ISO publish date of a article
+                    'body': string                          # The body of a article
+                    'pic': string in                        # The link of pictures of a article, or '' if there are no pictures
+                                                            f"{link1}|{text2}&&..." format
+                    'link': string                          # The url of a article
+                },
+                ...
+            ]
+            or
+            None
+
+        :param response: The scrapy response
         :return:
         """
         author = self.parse_author(response)
@@ -70,6 +89,7 @@ class CatholicAndEthnicNewspaperSpider(scrapy.Spider):
             date=short_date,
             author=author
         )
+        # TODO: Parse article and yield it
         yield item
 
     def parse_date(self, response):

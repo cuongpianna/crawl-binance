@@ -48,8 +48,8 @@
   + EnterpriseForumNewspaper
   + BusinessAndBrandVietnam
   + BridgeRoadTopicsNews
-  + CivilEngineeringNewspaper             (Argument)
-  + VietnamJournalOfConstruction  (Argument)
+  + CivilEngineeringNewspaper             (Argument: page)
+  + VietnamJournalOfConstruction  (Argument: page)
   + ConstructorMagazine
   + BuildingMaterialsMagazine
   + JournalOfConstructionPlanning
@@ -62,10 +62,11 @@
   + VietnamBanksAssociationSpider
   + VietnamChamberOfCommerceAndIndustry
   + VietnamBusinessForum
-  + MekongASEANReview              (Argument)
+  + MekongASEANReview              (Argument: page)
   + BiddingReview
   + EconomyAndForecastReview
   + VietnamIndustrialZoneReview
+  + PeopleNewspaper  (Argument: page)
 
 
 Note: I use scrapy selenium for 44th website. You need Google chrome version 86 to run it.
