@@ -62,11 +62,10 @@ class CatholicAndEthnicNewspaperSpider(scrapy.Spider):
                     'subhead': string,                      # The subtitle of a article, or '' if there is no subtitle
                     'print': string,                        # The page number of a article
                     'date': string in '%Y-%m-%d' format,    # The publish date of a article
-                    'timestamp': datetime                   # The ISO publish date of a article
                     'body': string                          # The body of a article
-                    'pic': string in                        # The link of pictures of a article, or '' if there are no pictures
+                    'pic_list': string in                        # The link of pictures of a article, or '' if there are no pictures
                                                             f"{link1}|{text2}&&..." format
-                    'link': string                          # The url of a article
+                    'original_link': string                          # The url of a article
                 },
                 ...
             ]
@@ -79,15 +78,17 @@ class CatholicAndEthnicNewspaperSpider(scrapy.Spider):
         author = self.parse_author(response)
         time_format, short_date = self.parse_date(response)
         item = NewsItem(
+
             title=response.xpath('//h1/text()').get(),
-            timestamp=time_format,
-            content_html=response.xpath('//div[@class="news_content entry-content"]').get(),
+            # timestamp=time_format,
+            print='',
             body=html2text.html2text(response.xpath('//div[@class="news_content entry-content"]').get()),
-            link=response.url,
+            original_link=response.url,
             subhead='',
-            pic=self.parse_pictures(response),
+            pic_list=self.parse_pictures(response),
             date=short_date,
-            author=author
+            author=author,
+            source=''
         )
         # TODO: Parse article and yield it
         yield item

@@ -68,12 +68,12 @@ class CorporateFinanceReviewSpider(scrapy.Spider):
         time_format, short_date = self.parse_date(response)
         item = NewsItem(
             title=response.xpath('//h1[@title]/text()').get().strip(),
-            timestamp=time_format,
-            content_html=response.xpath('//*[@id="noidung"]').get(),
+            # timestamp=time_format,
+            # content_html=response.xpath('//*[@id="noidung"]').get(),
             body=html2text.html2text(response.xpath('//*[@id="noidung"]').get()),
-            link=response.url,
+            original_link=response.url,
             subhead=html2text.html2text(response.xpath('//*[@id="noidung"]/h2').get()),
-            pic=self.parse_pictures(response),
+            pic_list=self.parse_pictures(response),
             date=short_date,
             author=response.xpath('//cite/text()').get()
         )
