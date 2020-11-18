@@ -58,7 +58,7 @@ class EconomyAndForecastReviewSpider(Spider):
 
     def parse_post(self, response):
         content_html = response.xpath('//div[@class="page_town_row"][4]').get()
-        return {
+        yield {
             'date': self.parse_timestamp(response, 'date'),
             'timestamp': self.parse_timestamp(response, 'iso'),
             'title': response.xpath('//div[@class="page_town_row"]/h2/text()').get(),
@@ -67,7 +67,10 @@ class EconomyAndForecastReviewSpider(Spider):
             'pic': self.parse_pic(response),
             'body': html2text(content_html),
             'content_html': content_html,
-            'author': self.parse_author(response)
+            'author': self.parse_author(response),
+            'site': '50_tap_chi_kinh_te_va_du_bao',
+            'source': '',
+            'print': ''
         }
 
     @staticmethod

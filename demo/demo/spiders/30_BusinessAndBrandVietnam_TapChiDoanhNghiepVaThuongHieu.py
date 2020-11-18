@@ -123,14 +123,15 @@ class BusinessAndBrandVietnamSpider(scrapy.Spider):
         time_format, short_date = self.parse_date(response)
         item = NewsItem(
             title=response.xpath('//h1/text()').get(),
-            timestamp=time_format,
-            content_html=response.xpath('//div[@class="col-md-12"]').get(),
             body=html2text.html2text(response.xpath('//div[@class="col-md-12"]').get()),
-            link=response.url,
+            original_link=response.url,
             subhead=response.xpath('//div[@class="des f-roboto-b t-16-mb dt-des"]/text()').get(),
-            pic=self.parse_pictures(response),
+            pic_list=self.parse_pictures(response),
             date=short_date,
-            author=author
+            author=author,
+            site='tap_chi_doanh_nghiep_va_thuong_hieu',
+            source='',
+            print=''
         )
         yield item
 

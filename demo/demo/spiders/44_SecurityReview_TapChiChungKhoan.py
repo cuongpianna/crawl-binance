@@ -83,14 +83,15 @@ class SecurityReviewSpider(scrapy.Spider):
         content, html = self.parse_content(response)
         item = NewsItem(
             title=html2text.html2text(response.xpath('//*[@id="pt1:pbl16"]').get()),
-            timestamp=time_format,
-            content_html=html,
             body=content,
-            link=response.url,
+            original_link=response.url,
             subhead=html2text.html2text(response.xpath('//*[@id="pt1:pbl18"]').get()),
-            pic='',
+            pic_list='',
             date=short_date,
-            author=''
+            author='',
+            site='44_tap_chi_chung_khoan',
+            source='',
+            print=''
         )
         yield item
 

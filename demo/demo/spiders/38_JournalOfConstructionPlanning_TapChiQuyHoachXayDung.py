@@ -38,7 +38,6 @@ class JournalOfConstructionPlanningSpider(scrapy.Spider):
             if posts:
                 for post in posts:
                     url_extract = post.extract()
-                    print(url_extract)
                     yield response.follow(url_extract, callback=self.parse_post)
 
         next_page = response.xpath('//a[@title="Next page"]/@href')
@@ -50,15 +49,16 @@ class JournalOfConstructionPlanningSpider(scrapy.Spider):
         author = self.parse_author(response)
         item = NewsItem(
             title=response.xpath('//h1/text()').get().strip(),
-            timestamp='',
-            content_html=response.xpath('//div[@class="content_detail"]').get(),
             body=self.parse_body(response),
-            link=response.url,
+            original_link=response.url,
             subhead=response.xpath('//div[@class="teaser_detail"]/text()').get() if response.xpath(
                 '//div[@class="teaser_detail"]/text()').get() else '',
-            pic=self.parse_pictures(response),
+            pic_list=self.parse_pictures(response),
             date='',
-            author=author
+            author=author,
+            site='tap_chi_quy_hoach_xay_dung',
+            source='',
+            print=''
         )
         yield item
 

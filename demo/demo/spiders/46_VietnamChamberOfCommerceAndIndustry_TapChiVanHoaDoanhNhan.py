@@ -34,14 +34,15 @@ class VietnamChamberOfCommerceAndIndustry(scrapy.Spider):
         time_format, short_date = self.parse_date(response)
         item = NewsItem(
             title=response.xpath('//h1/text()').get(),
-            timestamp=time_format,
-            content_html=response.xpath('//div[@class="post_content"]').get(),
             body=html2text.html2text(response.xpath('//div[@class="post_content"]').get()),
-            link=response.url,
+            original_link=response.url,
             subhead='',
-            pic=self.parse_pictures(response),
+            pic_list=self.parse_pictures(response),
             date=short_date,
-            author=author
+            author=author,
+            site='46_tap_chi_van_hoa_doanh_nhan',
+            source='',
+            print=''
         )
         yield item
 

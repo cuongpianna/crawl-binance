@@ -58,7 +58,7 @@ class BiddingReviewSpider(Spider):
 
     def parse_post(self, response):
         content_html = response.xpath('//main[@class="body cms-body column main-content"]').get()
-        return {
+        yield {
             'date': self.parse_timestamp(response, 'date'),
             'timestamp': self.parse_timestamp(response, 'iso'),
             'title': response.xpath('//h1[@class="title cms-title"]/text()').get(),
@@ -67,7 +67,10 @@ class BiddingReviewSpider(Spider):
             'pic': self.parse_pic(response),
             'body': html2text(response.xpath('//main[@class="body cms-body column main-content"]').get()),
             'content_html': content_html,
-            'author': self.parse_author(response)
+            'author': self.parse_author(response),
+            'site': '49_dau_thau',
+            'source': '',
+            'print': ''
         }
 
     @staticmethod

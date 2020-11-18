@@ -58,14 +58,15 @@ class TheSaigonTimesWeeklySpider(scrapy.Spider):
         time_format, short_date = self.parse_date(response)
         item = NewsItem(
             title=response.xpath('//*[@id="ARTICLEVIEW"]//p[@class="SGTOTitle"]/text()').get(),
-            timestamp=time_format,
-            content_html=response.xpath('//*[@class="Content"]').get(),
             body=html2text.html2text(response.xpath('//*[@class="Content"]').get()),
-            link=response.url,
+            original_link=response.url,
             subhead=response.xpath('//div[@id="ARTICLEVIEW"]//*[@class="SGTOSummary"]/text()').get().strip(),
-            pic=self.parse_pictures(response),
+            pic_list=self.parse_pictures(response),
             date=short_date,
-            author=author
+            author=author,
+            site='43_thoi_bao_kinh_te_sai_gon',
+            source='',
+            print=''
         )
         yield item
 

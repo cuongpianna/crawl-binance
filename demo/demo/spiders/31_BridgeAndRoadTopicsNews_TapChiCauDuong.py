@@ -72,14 +72,15 @@ class BridgeRoadTopicsNewsSpider(scrapy.Spider):
         time_format, short_date, author = self.parse_date_author(response)
         item = NewsItem(
             title=response.xpath('//h1/text()').get(),
-            timestamp=time_format,
-            content_html=response.xpath('//div[@class="noidung_chitiet"]').get(),
             body=html2text.html2text(response.xpath('//div[@class="noidung_chitiet"]').get()),
-            link=response.url,
+            original_link=response.url,
             subhead='',
-            pic=self.parse_pictures(response),
+            pic_list=self.parse_pictures(response),
             date=short_date,
-            author=author
+            author=author,
+            site='tap_chi_doanh_nghiep_va_thuong_hieu',
+            source='',
+            print=''
         )
         yield item
 

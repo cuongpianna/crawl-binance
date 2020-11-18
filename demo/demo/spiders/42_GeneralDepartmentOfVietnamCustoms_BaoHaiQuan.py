@@ -70,14 +70,15 @@ class GeneralDepartmentOfVietnamCustomsSpider(scrapy.Spider):
         time_format, short_date = self.parse_date(response)
         item = NewsItem(
             title=response.xpath('//h1/text()').get().strip(),
-            timestamp=time_format,
-            content_html=response.xpath('//div[@class="article-content __MASTERCMS_CONTENT __MB_CONTENT_FOR_PRINTER"]').get(),
             body=self.parse_body(response),
-            link=response.url,
+            original_link=response.url,
             subhead=response.xpath('//p[@class="detail-sapo"]/text()').get().strip(),
-            pic=self.parse_pictures(response),
+            pic_list=self.parse_pictures(response),
             date=short_date,
-            author=author
+            author=author,
+            site='42_bao_hai_quan',
+            source='',
+            print=''
         )
         yield item
 

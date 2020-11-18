@@ -89,14 +89,15 @@ class EnterpriseForumNewspaper(scrapy.Spider):
         if response.xpath('//h1[@class="post-title main-title"]/text()').get():
             item = NewsItem(
                 title=response.xpath('//h1[@class="post-title main-title"]/text()').get(),
-                timestamp=time_format,
-                content_html=content,
-                body=html,
-                link=response.url,
+                body=content,
+                original_link=response.url,
                 subhead=response.xpath('//h2[@class="post-sapo"]/strong/text()').get(),
-                pic=self.parse_pictures(response),
+                pic_list=self.parse_pictures(response),
                 date=short_date,
-                author=''
+                author='',
+                site='dien_dan_doanh_nghiep',
+                source='',
+                print=''
             )
             yield item
 

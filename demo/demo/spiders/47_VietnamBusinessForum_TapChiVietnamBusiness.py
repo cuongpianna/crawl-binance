@@ -86,15 +86,13 @@ class VietnamBusinessForumSpider(Spider):
     def parse_post(self, response):
         content_html = response.xpath('//div[@class="detail-blog-page"]/div[@class="desc-ctn"]').get()
         timestamp = response.xpath('//div[@class="time"]/p/text()').get()
-        return {
+        yield {
             'date': self.parse_timestamp(timestamp, 'date'),
-            'timestamp': self.parse_timestamp(timestamp, 'iso'),
             'title': response.xpath('//div[@class="detail-blog-page"]/h1/text()').get().strip(),
             'subhead': response.xpath('//div[@class="detail-blog-page"]/h1/text()').get().strip(),
             'link': response.url,
             'pic': self.parse_pic(response),
             'body': html2text(content_html),
-            'content_html': content_html,
             'author': response.xpath('//div[@class="desc-ctn"]/p/span/span/span/em/strong/text()').get() or \
                       response.xpath('//div[@class="desc-ctn"]/p/span/span/span/span/strong/text()').get() or \
                       response.xpath('//div[@class="desc-ctn"]/p/em/strong/span/span/span/text()').get() or \
@@ -108,7 +106,10 @@ class VietnamBusinessForumSpider(Spider):
                       response.xpath('//span/span/span/em/span/strong/text()').get() or \
                       response.xpath('//*[@class="desc-ctn"]/p/i/span/text()').get() or \
                       response.xpath(
-                          '(//*[@class="desc-ctn"]/div)[last()]//span[@style="font-weight: bold;"][last()]/text()').get()
+                          '(//*[@class="desc-ctn"]/div)[last()]//span[@style="font-weight: bold;"][last()]/text()').get(),
+            'site': '47_vietnam_business',
+            'source': '',
+            'print': ''
         }
 
     @staticmethod

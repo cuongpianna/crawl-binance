@@ -49,14 +49,15 @@ class ConstructorMagazineSpider(scrapy.Spider):
         time_format, short_date = self.parse_date(response)
         item = NewsItem(
             title=response.xpath('//h1/text()').get(),
-            timestamp=time_format,
-            content_html=response.xpath('//*[@class="fck_detail"]').get(),
             body=html2text.html2text(response.xpath('//*[@class="fck_detail"]"]').get()),
-            link=response.url,
+            original_link=response.url,
             subhead=response.xpath('//p[@class="description"]/strong/text()').get(),
-            pic=self.parse_pictures(response),
+            pic_list=self.parse_pictures(response),
             date=short_date,
-            author=author
+            author=author,
+            site='nguoi_xay_dung',
+            source='',
+            print=''
         )
         yield item
 

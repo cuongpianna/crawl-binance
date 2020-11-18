@@ -2,8 +2,10 @@ from scrapy import Spider
 from urllib.parse import urljoin
 
 from html2text import html2text
+from sqlalchemy.orm import sessionmaker
 from dateutil import parser
 from demo.items import NewsItem
+from demo.models import db_connect, create_table, Article
 
 categories = {
     'chinh_tri': 1171,
@@ -57,6 +59,8 @@ class TheYouthNewspaperSpider(Spider):
         :param response:
         :return:
         """
+
+        flag_break = False
         if response.xpath('//*[@class="pagination"]/li[@class="active"]/a/text()').get() == '1':
             top_news = response.xpath('//div[@class="highlight"]//h2/a/@href').get()
             yield response.follow(top_news, callback=self.parse_post)
@@ -70,13 +74,15 @@ class TheYouthNewspaperSpider(Spider):
         posts = response.xpath('//*[@class="zone--timeline"]//h2/a/@href')
         for post in posts:
             url = urljoin(self.base_url, post.extract())
+            if self.check_exist_article(url):
+                flag_break = True
             yield response.follow(url, self.parse_post)
 
         current_page = response.xpath('//*[@class="zone--timeline"]//ul/li[@class="active"]/a/text()').get()
         if current_page:
             next_page = response.xpath(
                 '//*[@class="zone--timeline"]//ul/li/a[text()="{}"]/@href'.format(int(current_page) + 1)).get()
-            if next_page and int(current_page) + 1 <= self.max_page:
+            if next_page and int(current_page) + 1 <= self.max_page and flag_break:
                 yield response.follow(next_page)
 
     def parse_post(self, response):
@@ -89,11 +95,12 @@ class TheYouthNewspaperSpider(Spider):
                     'author'                                # The author of a article, of '' if none
                     'subhead': string,                      # The subtitle of a article, or '' if there is no subtitle
                     'date': string in '%Y-%m-%d' format,    # The publish date of a article
-                    'timestamp': string in Iso 8061 format  # The ISO publish date of a article
                     'body': string                          # The body of a article
-                    'pic': string in                        # The link of pictures of a article, or '' if there are no pictures
-                                                                    f"{link1}|{text2}&&..." format
-                    'link': string                          # The url of a article
+                    'pic_list': string in                    # The link of pictures of a article, or '' if there are no pictures
+                                                                f"{link1}|{text2}&&..." format
+                    'original_link': string                   # The url of a article
+                    'source': string
+                    'print': string
                 },
                         ...
             ]
@@ -107,14 +114,15 @@ class TheYouthNewspaperSpider(Spider):
         content_html = response.xpath('//*[@id="abody"]').get()
         item = NewsItem(
             title=response.xpath('//*[@class="details__headline"]/text()').get(),
-            timestamp=self.parse_timestamp(response, 'iso'),
-            content_html=content_html,
             body=html2text(content_html),
-            link=response.url,
+            original_link=response.url,
             subhead=html2text(response.xpath('//div[@class="sapo"]').get()),
-            pic=self.parse_pic(response),
+            pic_list=self.parse_pic(response),
             date=self.parse_timestamp(response, 'date'),
-            author=self.parse_author(response)
+            author=self.parse_author(response),
+            site='96_bao_thanh_nien',
+            source='',
+            print=''
         )
         yield item
 
@@ -174,3 +182,11 @@ class TheYouthNewspaperSpider(Spider):
         if response.xpath('//div[@class="left"]/h4/a/text()').get():
             return html2text(response.xpath('//div[@class="left"]/h4/a/text()').get())
         return ''
+
+    def check_exist_article(self, url):
+        engine = db_connect()
+        create_table(engine)
+        Session = sessionmaker(bind=engine)
+        session = Session()
+        exist_article = session.query(Article).filter_by(original_link=url).first()
+        return exist_article

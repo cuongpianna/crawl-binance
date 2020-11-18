@@ -91,16 +91,23 @@ class CivilEngineeringNewspaperSpider(scrapy.Spider):
                 '//div[@class="category article-content __MASTERCMS_CONTENT __MB_CONTENT_FOR_PRINTER"]').get(),
             body=html2text.html2text(response.xpath(
                 '//div[@class="category article-content __MASTERCMS_CONTENT __MB_CONTENT_FOR_PRINTER"]').get()),
-            link=response.url,
+            original_link=response.url,
             subhead=response.xpath('//div[@class="category article-content __MASTERCMS_CONTENT __MB_CONTENT_FOR_PRINTER"]//p[1]/strong[1]/text()').get(),
-            pic=self.parse_pictures(response),
+            pic_list=self.parse_pictures(response),
             date=short_date,
-            author=author
+            author=author,
+            site='bao_xay_dung',
+            source='',
+            print=''
         )
         yield item
 
     def parse_date(self, response):
-        # 17:48 | 01/11/2020
+        """
+        Convert datetime string to timestamp 17:48 | 01/11/2020
+        :param response:
+        :return:
+        """
         string_time = response.xpath('//span[@class="format_time"]/text()').get()
         string_date = response.xpath('//span[@class="format_date"]/text()').get()
         raw_time = string_time + ' ' + string_date

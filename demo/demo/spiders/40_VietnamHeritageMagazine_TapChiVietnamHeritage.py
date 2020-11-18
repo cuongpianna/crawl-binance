@@ -36,14 +36,15 @@ class VietnamHeritageMagazineSpider(scrapy.Spider):
         time_format, short_date = self.parse_date(response)
         item = NewsItem(
             title=response.xpath('//h1/text()').get(),
-            timestamp=time_format,
-            content_html=response.xpath('//section[@class="cb-entry-content clearfix"]').get(),
             body=html2text.html2text(response.xpath('//section[@class="cb-entry-content clearfix"]').get()),
-            link=response.url,
+            original_link=response.url,
             subhead='',
-            pic=self.parse_pictures(response),
+            pic_list=self.parse_pictures(response),
             date=short_date,
-            author=author
+            author=author,
+            site='40_tap_chi_viet_nam_heritage',
+            source='',
+            print=''
         )
         yield item
 

@@ -78,17 +78,17 @@ class CatholicAndEthnicNewspaperSpider(scrapy.Spider):
         author = self.parse_author(response)
         time_format, short_date = self.parse_date(response)
         item = NewsItem(
-
+            site='bao_cong_giao_va_dan_toc',
             title=response.xpath('//h1/text()').get(),
             # timestamp=time_format,
-            print='',
             body=html2text.html2text(response.xpath('//div[@class="news_content entry-content"]').get()),
             original_link=response.url,
             subhead='',
             pic_list=self.parse_pictures(response),
             date=short_date,
             author=author,
-            source=''
+            source='',
+            print=''
         )
         # TODO: Parse article and yield it
         yield item

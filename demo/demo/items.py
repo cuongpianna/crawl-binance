@@ -13,3 +13,4 @@ class NewsItem(scrapy.Item):
     pic_list = scrapy.Field()
     date = scrapy.Field()
     source = scrapy.Field()
+    site = scrapy.Field()

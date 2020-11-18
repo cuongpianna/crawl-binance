@@ -64,9 +64,9 @@ class TuoitreSpider(scrapy.Spider):
             body=html2text.html2text(response.xpath('//div[@class="main-content-body"]').get()),
             tags=tags,
             category=cate,
-            link=response.url,
+            original_link=response.url,
             subhead=response.xpath('//h2[@class="sapo"]/text()').get(),
-            pic=self.parse_pictures(response),
+            pic_list=self.parse_pictures(response),
             date=self.parse_date(response),
             author=author
         )

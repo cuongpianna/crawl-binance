@@ -39,14 +39,15 @@ class VietnamJournalOfConstructionSpider(scrapy.Spider):
         time_format, short_date = self.parse_date(response)
         item = NewsItem(
             title=response.xpath('//h1[@itemprop="headline"]/text()').get(),
-            timestamp=time_format,
-            content_html=response.xpath('//div[@class="content-detail"]').get(),
             body=html2text.html2text(response.xpath('//div[@class="content-detail"]').get()),
-            link=response.url,
+            original_link=response.url,
             subhead=html2text.html2text(response.xpath('//div[@class="brief-detail"]').get()),
-            pic=self.parse_pictures(response),
+            pic_list=self.parse_pictures(response),
             date=short_date,
-            author=self.parse_author(response)
+            author=self.parse_author(response),
+            site='tap_chi_xay_dung',
+            source='',
+            print=''
         )
         yield item
 

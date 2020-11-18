@@ -82,7 +82,7 @@ class PeopleNewspaperSpider(Spider):
             """
 
         content_html = response.xpath('//div[@class="detail-content-body "]').get()
-        return {
+        yield {
             'date': self.parse_timestamp(response, 'date'),
             'timestamp': self.parse_timestamp(response, 'iso'),
             'title': response.xpath('//h1/text()').get(),
@@ -91,7 +91,10 @@ class PeopleNewspaperSpider(Spider):
             'pic': self.parse_pic(response),
             'body': html2text(content_html),
             'content_html': content_html,
-            'author': self.parse_author(response)
+            'author': self.parse_author(response),
+            'site': '93_bao_nhan_dan',
+            'source': '',
+            'print': ''
         }
 
     @staticmethod

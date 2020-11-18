@@ -1,6 +1,7 @@
 import logging
 import csv
 import os
+from dateutil.parser import parse as date_parse
 
 from sqlalchemy.orm import sessionmaker
 from demo.models import db_connect, create_table, Article
@@ -13,13 +14,18 @@ class CSVWriter():
 
     def __init__(self, filename):
         self.filename = filename
-        self.fp = open(self.filename, 'w', encoding='utf8')
-        fieldnames = ['date', 'title']
-        self.writerRow = csv.DictWriter(self.fp, fieldnames=fieldnames)
+        file_exists = os.path.isfile(filename)
+        if not file_exists:
+            fieldnames = ['date', 'title', 'original_link', 'subhead', 'author', 'source', 'pic_list', 'body']
+            self.fp = open(self.filename, 'a', encoding='utf8', newline='')
+            self.writerRow = csv.DictWriter(self.fp, fieldnames=fieldnames)
+            self.writerRow.writeheader()
+        else:
+            self.fp = open(self.filename, 'a', encoding='utf8', newline='')
+            fieldnames = ['date', 'title', 'original_link', 'subhead', 'author', 'source', 'pic_list', 'body']
+            self.writerRow = csv.DictWriter(self.fp, fieldnames=fieldnames)
 
-        self.writerRow.writeheader()
         self.writer = csv.writer(self.fp, delimiter=';', quotechar='"', quoting=csv.QUOTE_ALL, lineterminator='\n')
-
 
     def close(self):
         self.fp.close()
@@ -28,7 +34,10 @@ class CSVWriter():
         self.writer.writerow(elems)
 
     def write_element(self, item):
-        self.writerRow.writerow({'date': item['date'], 'title': item['title']})
+        self.writerRow.writerow(
+            {'date': item['date'], 'title': item['title'], 'original_link': item['original_link'],
+             'subhead': item['subhead'], 'author': item['author'],
+             'source': item['source'], 'pic_list': item['pic_list'], 'body': item['body']})
 
     def size(self):
         return os.path.getsize(self.filename)
@@ -52,7 +61,6 @@ class SaveNewsPipeline(object):
         """Save data in the database
         This method is called for every item pipeline component
         """
-        print(item)
         session = self.Session()
 
         article = Article()
@@ -60,11 +68,13 @@ class SaveNewsPipeline(object):
         article.title = item['title']
         article.date = item['date']
 
+        news_date = date_parse(item['date'])
+        filename = '{}-{}-{}.csv'.format(item['site'], news_date.month, news_date.year)
+
         # save article to db
         exist_article = session.query(Article).filter_by(original_link=article.original_link).first()
         if exist_article is None:
-            print('@@@@@@@@')
-            mycsv = CSVWriter('tests.csv')
+            mycsv = CSVWriter(filename)
             mycsv.write_element(item)
             try:
                 session.add(article)

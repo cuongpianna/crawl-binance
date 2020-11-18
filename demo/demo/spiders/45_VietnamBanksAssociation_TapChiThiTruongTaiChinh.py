@@ -69,14 +69,15 @@ class VietnamBanksAssociationSpider(scrapy.Spider):
         time_format, short_date = self.parse_date(response)
         item = NewsItem(
             title=response.xpath('//h1/text()').get(),
-            timestamp=time_format,
-            content_html=response.xpath('//div[@class="description"]').get(),
             body=html2text.html2text(response.xpath('//div[@class="description"]').get()),
-            link=response.url,
+            original_link=response.url,
             subhead=response.xpath('//div[@class="shortDesc"]/text()').get().strip(),
-            pic=self.parse_pictures(response),
+            pic_list=self.parse_pictures(response),
             date=short_date,
-            author=author
+            author=author,
+            site='45_tap_chi_thi_truong_tai_chinh',
+            source='',
+            print=''
         )
         yield item
 

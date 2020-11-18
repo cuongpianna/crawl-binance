@@ -50,7 +50,7 @@ class VidsSpider(Spider):
 
     def parse_post(self, response):
         content_html = response.xpath('//div[@class="Normal"]').get()
-        return {
+        yield {
             'date': self.parse_timestamp(response, 'date'),
             'timestamp': self.parse_timestamp(response, 'iso'),
             'title': response.xpath('//div[@id="tTitle"]/span/text()').get(),
@@ -59,7 +59,10 @@ class VidsSpider(Spider):
             'pic': self.parse_pic(response),
             'body': html2text(content_html),
             'content_html': content_html,
-            'author': self.parse_author(response)
+            'author': self.parse_author(response),
+            'site': '51_tap_chi_cong_nghiep_viet_nam',
+            'source': '',
+            'print': ''
         }
 
     @staticmethod

@@ -62,7 +62,7 @@ class MekongseanSpider(Spider):
     def parse_post(self, response):
         content_html = response.xpath('//div[@class="td-post-content"]').get()
         timestamp = response.xpath('//time[@class="entry-date updated td-module-date"]/@datetime').get()
-        return {
+        yield {
             'date': self.parse_timestamp(timestamp, 'date'),
             'timestamp': self.parse_timestamp(timestamp, 'iso'),
             'title': response.xpath('//h1[@class="entry-title"]/text()').get(),
@@ -71,7 +71,10 @@ class MekongseanSpider(Spider):
             'pic': self.parse_pic(response),
             'body': html2text(content_html),
             'content_html': content_html,
-            'author': response.xpath('//div[@class="td-post-small-box"]/a/text()').get()
+            'author': response.xpath('//div[@class="td-post-small-box"]/a/text()').get(),
+            'site': '48_tap_chi_dien_tu_me_kong',
+            'source': '',
+            'print': ''
         }
 
     @staticmethod

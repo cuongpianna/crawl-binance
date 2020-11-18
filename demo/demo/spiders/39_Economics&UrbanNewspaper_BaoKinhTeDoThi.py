@@ -81,15 +81,15 @@ class EconomicsAndUrbanNewspaperSpider(scrapy.Spider):
         time_format, short_date = self.parse_date(response)
         item = NewsItem(
             title=response.xpath('//h1/text()').get().strip(),
-            timestamp=time_format,
-            content_html=response.xpath(
-                '//*[@id="cotent_detail"]').get(),
             body=self.parse_body(response),
-            link=response.url,
+            original_link=response.url,
             subhead=response.xpath('//div[@class="sapo_detail fr"]/text()').get().strip(),
-            pic=self.parse_pictures(response),
+            pic_list=self.parse_pictures(response),
             date=short_date,
-            author=author
+            author=author,
+            site='bao_kinh_te_do_thi',
+            source='',
+            print=''
         )
         yield item
 
