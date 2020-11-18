@@ -23,7 +23,7 @@
 
   Run project:
 
-  scrapy crawl SPIDER_NAME -o CSV_NAME.csv -t csv
+  scrapy crawl SPIDER_NAME
 
 
 
@@ -32,11 +32,11 @@
   
   example:
    
-    scrapy crawl CatholicAndEthnicNewspaper -o CatholicAndEthnicNewspaper.csv -t csv
+    scrapy crawl CatholicAndEthnicNewspaper
   
   With spiders using argument to crawl, you can pass argument to crawl lie:
   
-    scrapy crawl CatholicAndEthnicNewspaper -o CatholicAndEthnicNewspaper.csv -t csv -a page=1000
+    scrapy crawl CatholicAndEthnicNewspaper -a page=1000
 
     
   
@@ -67,6 +67,8 @@
   + EconomyAndForecastReview
   + VietnamIndustrialZoneReview
   + PeopleNewspaper  (Argument: page)
+  + TheYouthNewspaper
+  + WorkersNewspaper (Argument: page)
 
 
 Note: I use scrapy selenium for 44th website. You need Google chrome version 86 to run it.
