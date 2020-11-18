@@ -37,7 +37,7 @@ class CSVWriter():
         self.writerRow.writerow(
             {'date': item['date'], 'title': item['title'], 'original_link': item['original_link'],
              'subhead': item['subhead'], 'author': item['author'],
-             'source': item['source'], 'pic_list': item['pic_list'], 'body': item['body']})
+             'source': item['source'], 'print': item['print'], 'pic_list': item['pic_list'], 'body': item['body']})
 
     def size(self):
         return os.path.getsize(self.filename)
