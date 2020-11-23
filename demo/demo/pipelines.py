@@ -16,13 +16,13 @@ class CSVWriter():
         self.filename = filename
         file_exists = os.path.isfile(filename)
         if not file_exists:
-            fieldnames = ['date', 'title', 'original_link', 'subhead', 'author', 'source', 'pic_list', 'body']
+            fieldnames = ['date', 'title', 'original_link', 'subhead', 'author', 'source', 'print', 'pic_list', 'body']
             self.fp = open(self.filename, 'a', encoding='utf8', newline='')
             self.writerRow = csv.DictWriter(self.fp, fieldnames=fieldnames)
             self.writerRow.writeheader()
         else:
             self.fp = open(self.filename, 'a', encoding='utf8', newline='')
-            fieldnames = ['date', 'title', 'original_link', 'subhead', 'author', 'source', 'pic_list', 'body']
+            fieldnames = ['date', 'title', 'original_link', 'subhead', 'author', 'source', 'print', 'pic_list', 'body']
             self.writerRow = csv.DictWriter(self.fp, fieldnames=fieldnames)
 
         self.writer = csv.writer(self.fp, delimiter=';', quotechar='"', quoting=csv.QUOTE_ALL, lineterminator='\n')
