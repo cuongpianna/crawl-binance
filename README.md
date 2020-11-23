@@ -69,6 +69,15 @@
   + PeopleNewspaper  (Argument: page)
   + TheYouthNewspaper
   + WorkersNewspaper (Argument: page)
+  + TienPhongNewspaper
+  + ThePeoplePoliceNewspaper
+  + DanTriNewspaper  (Argument: page)
+  + VietnamNews  (VNExpress)
+  + VietnamNet (Argument: page)
+  + PeoplePoliceNewspaper
+  + VocationalGuidanceAndIntegrationReview
+  + UrbanPeopleMagazine (Argument: page)
+  + JournalOfLaborAndSocialAffairs (Argument: page)
 
 
 Note: I use scrapy selenium for 44th website. You need Google chrome version 86 to run it.
