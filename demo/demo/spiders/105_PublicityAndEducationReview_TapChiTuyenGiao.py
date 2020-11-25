@@ -1,71 +1,55 @@
-from datetime import datetime
 import re
 
 import html2text
-import requests
 from dateutil.parser import parse as date_parse
 from scrapy import Spider, Request
 from html2text import html2text
 from sqlalchemy.orm import sessionmaker
 from demo.items import NewsItem
 from demo.models import db_connect, create_table, Article
-
-categories = ['thoi-su', 'kinh-doanh', 'giai-tri', 'the-gioi', 'giao-duc', 'doi-song', 'phap-luat', 'the-thao',
-              'cong-nghe', 'suc-khoe', 'bat-dong-san', 'ban-doc', 'tuanvietnam', 'oto-xe-may']
+from urllib.parse import urljoin
 
 
-class VietnamNetSpider(Spider):
-    name = 'VietnamNet'
-    site_name = 'vietnamnet.vn'
-    allowed_domains = ['vietnamnet.vn']
+class PublicityAndEducationReviewSpider(Spider):
+    name = 'PublicityAndEducationReview'
+    site_name = 'www.tuyengiao.vn'
+    allowed_domains = ['www.tuyengiao.vn']
 
-    base_url = 'https://vietnamnet.vn/'
-    url_templates = 'https://vietnamnet.vn/jsx/loadmore/?domain=desktop&c={cate}&p={page}&s=15&a=5'
+    base_url = 'http://www.tuyengiao.vn/'
+
+    start_urls = [
+        'http://www.tuyengiao.vn/thoi-su',
+        'http://www.tuyengiao.vn/nhip-cau-tuyen-giao',
+        'http://www.tuyengiao.vn/theo-guong-bac',
+        'http://www.tuyengiao.vn/bao-ve-nen-tang-tu-tuong-cua-dang',
+        'http://www.tuyengiao.vn/van-hoa-xa-hoi',
+        'http://www.tuyengiao.vn/khoa-giao',
+        'http://www.tuyengiao.vn/kinh-te',
+        'http://www.tuyengiao.vn/the-gioi',
+        'http://www.tuyengiao.vn/tu-lieu'
+    ]
 
     custom_settings = {
         'USER_AGENT': 'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.93 Safari/537.36',
     }
 
-    def __init__(self, page=1500, *args, **kwargs):
-        super(VietnamNetSpider, self).__init__(*args, **kwargs)
-        self.page = int(page)
-
-    def start_requests(self):
-        urls = []
-
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.93 Safari/537.36',
-        }
-
-        for cate in categories:
-            for i in range(1, self.page + 1):
-                url = self.url_templates.format(page=i, cate=cate)
-                rq = requests.get(url, headers=headers).text
-                matchs = re.findall(r'"link": ".*"', rq)
-                for link in matchs:
-                    link = link.replace('"link": ', '')
-                    link = link[1:-1]
-                    if self.check_exist_article(link):
-                        break
-                urls.append(url)
-        for url in urls:
-            yield Request(url=url, callback=self.parse)
-
     def parse(self, response):
-        """
-            Get all article urls and yield it to parse_post function
-            :param response:
-            :return:
-        """
-        rq = requests.get(response.url).text
-        matchs = re.findall(r'"link": ".*"', rq)
-        for link in matchs:
-            link = link.replace('"link": ', '')
-            link = link[1:-1]
-            yield Request(link, callback=self.parse_post)
+        flag_break = False
+        posts = response.xpath('//div[@class="zonepage-l"]//h4/a/@href')
+        for post in posts:
+            url = urljoin(self.base_url, post.extract())
+            if self.check_exist_article(url):
+                flag_break = True
+            yield Request(url, callback=self.parse_post)
+
+        # next = response.xpath('//div[@class="datapager"]/span[@class="active"]/following-sibling::a[1]/@href').get()
+        # if next and not flag_break:
+        #     yield Request(urljoin(self.base_url, next))
 
     def parse_post(self, response):
+        print('@@@@@@@@@@@@')
         """ This function returns newspaper articles on a given date in a given structure.
+
                     Return data structure:
                     [
                         {
@@ -84,18 +68,19 @@ class VietnamNetSpider(Spider):
                     ]
                     or
                     None
+
             :param response: The scrapy response
             :return:
         """
 
         item = NewsItem(
 
-            site='103_vietnamnet',
-            title=response.xpath('//h1[@class="title f-22 c-3e"]/text()').get().strip(),
+            site='105_tapchituyengiao',
+            title=response.xpath('//span[@class="story_headline"]/text()').get().strip(),
             original_link=response.url,
-            body=html2text(response.xpath('//*[@id="ArticleContent"]').get()),
+            body=html2text(response.xpath('//*[@class="story_body"]').get()),
             date=self.parse_timestamp(response),
-            subhead=html2text(response.xpath('//*[@class="bold ArticleLead"]').get()),
+            subhead=html2text(response.xpath('//*[@class="story_teaser clearfix"]').get()),
             pic_list=self.parse_pic(response),
             author=self.parse_author(response),
             source='',
@@ -110,8 +95,9 @@ class VietnamNetSpider(Spider):
                 :param response: 2020-04-09T10:30:00
                 :return: date
         """
-        created_raw = response.xpath('//span[@class="ArticleDate"]/text()').get()
-        created_at = date_parse(created_raw)
+        created_raw = response.xpath('//span[@class="story_date"]/text()').get()
+        match_time = re.search(r'[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}', created_raw).group(0)
+        created_at = date_parse(match_time)
         return created_at.strftime('%d/%m/%Y')
 
     def parse_author(self, response):
@@ -125,8 +111,7 @@ class VietnamNetSpider(Spider):
                 response.xpath('//*[@id="ArticleContent"]/p[last()]').get())
         return ''
 
-    @staticmethod
-    def parse_pic(response):
+    def parse_pic(self, response):
         """
         Get pictures list from response. Format: link|title&&link|title
         Or
@@ -135,8 +120,18 @@ class VietnamNetSpider(Spider):
         :return: list pictures
         """
 
-        image_list = response.xpath('//*[@id="ArticleContent"]//img/@src').extract()
-        captions_list = response.xpath('//*[@id="ArticleContent"]//img/@alt').extract()
+        avatar = response.xpath('//*[@class="story_avatar_b"]/img/@src').get()
+        caption = response.xpath('//*[@class="story_avatar_b"]/span/text()').get()
+
+        images = [avatar]
+        captions = [caption]
+
+        image_list = response.xpath('//div[@class="storydetail clearfix"]//table[@class="tbl-image"]//img/@src').extract()
+        captions_list = response.xpath('//div[@class="storydetail clearfix"]//table[@class="tbl-image"]//td[@class="td-image-desc"]/p/text()').extract()
+
+        image_list = images + image_list
+        image_list = [urljoin(self.base_url, item) for item in image_list]
+        captions = images + captions_list
 
         res = [i + '|' + j for i, j in zip(image_list, captions_list)]
 
