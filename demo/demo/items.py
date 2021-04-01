@@ -14,3 +14,22 @@ class NewsItem(scrapy.Item):
     date = scrapy.Field()
     source = scrapy.Field()
     site = scrapy.Field()
+
+
+class ProjectItem(scrapy.Item):
+    Crypt = scrapy.Field()
+    Name = scrapy.Field()
+    Tagline = scrapy.Field()
+    Date = scrapy.Field()
+    Description = scrapy.Field()
+    TokenSummary = scrapy.Field()
+    AdditionalFeatures = scrapy.Field()
+    # EconomicsAndSupplyDistribution = scrapy.Field()
+    # ProjectTeam = scrapy.Field()
+    # ActivityAndCommunityOverview = scrapy.Field()
+    # SocialActivity = scrapy.Field()
+    Website = scrapy.Field()
+    Explorer = scrapy.Field()
+    SourceCode = scrapy.Field()
+    TechnicalDocument = scrapy.Field()
+    # AdditionalResources = scrapy.Field()
