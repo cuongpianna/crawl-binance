@@ -5,6 +5,11 @@ from dateutil.parser import parse as date_parse
 
 from sqlalchemy.orm import sessionmaker
 from demo.models import db_connect, create_table, Article
+import pymongo
+from scrapy.exceptions import DropItem
+
+
+from demo.settings import MONGODB_SERVER, MONGODB_PORT, MONGODB_COLLECTION, MONGODB_COLLECTION_CATE, MONGODB_DB
 
 
 class CSVWriter():
@@ -84,5 +89,37 @@ class SaveNewsPipeline(object):
                 raise
             finally:
                 session.close()
+
+        return item
+
+
+class MongoDBPipeline(object):
+
+    def __init__(self):
+        connection = pymongo.MongoClient(
+            MONGODB_SERVER,
+            MONGODB_PORT
+        )
+        db = connection[MONGODB_DB]
+        self.film = db[MONGODB_COLLECTION]
+        self.cates = db[MONGODB_COLLECTION_CATE]
+
+    def process_item(self, item, spider):
+        categories_id = []
+        if item['cates']:
+            for cate in item['cates']:
+                cate_old = self.cates.find_one({'name': cate}, {})
+                if cate_old:
+                    categories_id.append(cate_old['_id'])
+                else:
+                    obj_id = self.cates.insert({'name': cate})
+                    categories_id.append(str(obj_id))
+        item['categories_id'] = categories_id
+
+        film = self.film.find_one({'name': item['name']})
+        if not film:
+            self.film.insert(dict(item))
+        else:
+            pass
 
         return item

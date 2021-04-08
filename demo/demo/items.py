@@ -33,3 +33,9 @@ class ProjectItem(scrapy.Item):
     SourceCode = scrapy.Field()
     TechnicalDocument = scrapy.Field()
     # AdditionalResources = scrapy.Field()
+
+
+class FilmItem(scrapy.Item):
+    name = scrapy.Field()
+    cates = scrapy.Field()
+    categories_id = scrapy.Field()

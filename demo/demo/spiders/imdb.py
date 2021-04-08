@@ -2,43 +2,41 @@ from scrapy import Spider, Request
 import re
 from datetime import datetime
 from html2text import html2text
-from demo.items import ProjectItem
+from demo.items import FilmItem
 
 
-class BinanceSpider(Spider):
-    name = 'BinanceSpider'
-    start_urls = ['https://research.binance.com/en/projects']
-    base_url = 'research.binance.com'
+class IMDBSpider(Spider):
+    name = 'IMDBSpider'
+    start_urls = ['https://www.imdb.com//search/title/?view=simple&sort=release_date,desc&start=1&ref_=adv_nxt']
+    base_url = 'https://www.imdb.com/'
 
     def parse(self, response):
-        top_post = response.xpath(
-            '//div[@class="jsx-2930351579 list"]/a/@href')
+        top_post = response.xpath('//div[@class="lister-item mode-simple"]//div[@class="col-title"]//a/@href')
 
         for post in top_post:
             yield response.follow(post.get(), callback=self.parse_post)
 
+        next_url = response.xpath('(//div[@class="desc"])[1]/a[@class="lister-page-next next-page"]/@href').get()
+        print('cuonggggggggg')
+        print(next_url)
+        if next_url:
+            yield response.follow(next_url, callback=self.parse)
+
     def parse_post(self, response):
-        name, crypt = self.parse_name(response)
-        item = ProjectItem(
-            Crypt=name,
-            Name=name,
-            Tagline=html2text(response.xpath('//em').get()).strip(),
-            Date=html2text(response.xpath('//time').get()).strip(),
-            Description=html2text(response.xpath('//div[@class="jsx-341700367"]').get()).strip(),
-            Website=response.xpath('//ul[@class="jsx-2167690016"]/li/a[text()="Website"]/@href').get(),
-            Explorer=response.xpath('//ul[@class="jsx-2167690016"]/li/a[text()="Explorer"]/@href').get(),
-            SourceCode=response.xpath('//ul[@class="jsx-2167690016"]/li/a[text()="Source Code"]/@href').get(),
-            TechnicalDocument=response.xpath('//ul[@class="jsx-2167690016"]/li/a[text()="Technical Documentation"]/@href').get()
+        categories = self.parse_categories(response)
+        item = FilmItem(
+            name=response.xpath('//div[@class="title_wrapper"]/h1/text()').get().strip(),
+            cates=categories
         )
         yield item
 
-    def parse_name(self, response):
-        name_html = html2text(response.xpath('//h1/text()').get()).strip()
-        crypt = re.findall(r'(\(.*?\))', name_html)
-        crypt = crypt[0]
-        crypt = crypt[1:-1]
-        name = name_html[:name_html.index('(')]
-        return name, crypt
+    def parse_categories(self, response):
+        cates = response.xpath('//div[@class="see-more inline canwrap"]/a/text()').extract()
+        result = []
+        for cate in cates:
+            if cate.strip() != '' and cate:
+                result.append(cate)
+        return result
 
     @staticmethod
     def parse_pic(response):
