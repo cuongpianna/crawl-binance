@@ -39,3 +39,19 @@ class FilmItem(scrapy.Item):
     name = scrapy.Field()
     cates = scrapy.Field()
     categories_id = scrapy.Field()
+
+
+class ProductItem(scrapy.Item):
+    name = scrapy.Field()
+    cate = scrapy.Field()
+    images = scrapy.Field()
+    features = scrapy.Field()
+    brand = scrapy.Field()
+    sku = scrapy.Field()
+    rate = scrapy.Field()
+    description = scrapy.Field()
+    category_id = scrapy.Field()
+    features = scrapy.Field()
+    included = scrapy.Field()
+    specifications = scrapy.Field()
+    global_link = scrapy.Field()

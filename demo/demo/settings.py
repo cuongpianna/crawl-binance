@@ -5,7 +5,7 @@ NEWSPIDER_MODULE = 'demo.spiders'
 
 ROBOTSTXT_OBEY = False
 
-CONCURRENT_REQUESTS = 5
+CONCURRENT_REQUESTS = 1
 
 DOWNLOADER_MIDDLEWARES = {
     'scrapy_selenium.SeleniumMiddleware': 800,
@@ -23,6 +23,6 @@ CONNECTION_STRING = 'sqlite:///news.db'
 
 MONGODB_SERVER = "localhost"
 MONGODB_PORT = 27017
-MONGODB_DB = "imdb"
-MONGODB_COLLECTION = "films"
-MONGODB_COLLECTION_CATE = "cates"
+MONGODB_DB = "welding"
+MONGODB_COLLECTION = "product"
+MONGODB_COLLECTION_CATE = "category"
