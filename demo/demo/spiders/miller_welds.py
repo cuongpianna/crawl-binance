@@ -1,14 +1,10 @@
-from scrapy import Spider, Request
-import re
+from scrapy import Spider
 from datetime import datetime
-from html2text import html2text
 from demo.items import ProductItem
 from scrapy_selenium import SeleniumRequest
-from selenium import webdriver
 import os
 import urllib.parse
 from urllib.request import urlretrieve
-import time
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
 
@@ -164,9 +160,9 @@ class IMDBSpider(Spider):
         return included
 
     def parse_features(self, response):
-        print('@@@@@@@@@@')
-        features = response.xpath('//div[@Class="feature-description"]').extract()
-        print(self.driver.find_elements_by_xpath('//div[@class="features"]//div[@Class="feature-description"]'))
-        print('@@@@@@@@@@@@@@@@@')
-        print(features)
-        return features
+        self.driver = response.meta['driver']
+        features = self.driver.find_elements_by_xpath('//div[@class="features"]//div[@Class="feature-description"]')
+        results = []
+        for feature in features:
+            results.append(feature.get_attribute('innerHTML'))
+        return results

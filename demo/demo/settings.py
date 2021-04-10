@@ -23,6 +23,6 @@ CONNECTION_STRING = 'sqlite:///news.db'
 
 MONGODB_SERVER = "localhost"
 MONGODB_PORT = 27017
-MONGODB_DB = "welding"
+MONGODB_DB = "TestWelders"
 MONGODB_COLLECTION = "product"
 MONGODB_COLLECTION_CATE = "category"

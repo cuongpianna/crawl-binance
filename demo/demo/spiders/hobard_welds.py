@@ -21,13 +21,13 @@ class IMDBSpider(Spider):
 
     base_url = 'https://www.hobartwelders.com/'
 
-    # custom_settings = {
-    #     'DUPEFILTER_CLASS': 'scrapy.dupefilters.BaseDupeFilter',
-    #     'SELENIUM_DRIVER_NAME': 'chrome',
-    #     'SELENIUM_DRIVER_EXECUTABLE_PATH': os.path.join(os.path.abspath(os.curdir), 'chromedriver.exe'),
-    #     'SELENIUM_DRIVER_ARGUMENTS': ['non-headless', '-start-maximized']
-    #
-    # }
+    custom_settings = {
+        'DUPEFILTER_CLASS': 'scrapy.dupefilters.BaseDupeFilter',
+        'SELENIUM_DRIVER_NAME': 'chrome',
+        'SELENIUM_DRIVER_EXECUTABLE_PATH': os.path.join(os.path.abspath(os.curdir), 'chromedriver.exe'),
+        'SELENIUM_DRIVER_ARGUMENTS': ['headless', '-start-maximized']
+
+    }
 
     def __init__(self, *args, **kwargs):
         self.driver = None
@@ -38,7 +38,7 @@ class IMDBSpider(Spider):
             yield SeleniumRequest(url=url, callback=self.parse)
 
     def parse(self, response):
-        top_post = response.xpath('//div[@class="product span-3"]/a/@href')
+        top_post = response.xpath('//div[@id="products-list"]//div[@class="image"]/a/@href')
 
         for post in top_post:
             url = urllib.parse.urljoin(self.base_url, post.get())
@@ -49,14 +49,12 @@ class IMDBSpider(Spider):
         #     yield response.follow(next_url, callback=self.parse)
 
     def parse_post(self, response):
-        # categories = self.parse_categories(response)
-        time.sleep(15)
         item = ProductItem(
             name=response.xpath('//h1[@id="product-subtitle"]/text()').get().strip(),
             cate=response.xpath('//div[@class="breadcrumb-trail"]//ul/li[7]/a/text()').get().strip(),
-            brand='Miller',
+            brand='Hobart',
             sku=response.xpath('//span[@id="product-sku"]/text()').get().strip(),
-            rate=response.xpath('//*[@class="pr-snippet-rating-decimal/text()"]').get().strip() if response.xpath(
+            rate=response.xpath('//*[@class="pr-snippet-rating-decimal"]/text()').get().strip() if response.xpath(
                 '//*[@class="pr-snippet-rating-decimal/text()"]') else 0,
             description=response.xpath('//*[@class="sales-copy"]/text()').get().strip(),
             images=self.parse_images(response),
@@ -161,6 +159,7 @@ class IMDBSpider(Spider):
         return included
 
     def parse_features(self, response):
+        self.driver = response.meta['driver']
         features = response.xpath('//div[@class="features"]//div[@Class="feature-description"]').extract()
         print(self.driver.find_elements_by_xpath('//div[@class="features"]//div[@Class="feature-description"]'))
         print('@@@@@@@@@@@@@@@@@')
